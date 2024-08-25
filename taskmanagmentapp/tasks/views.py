@@ -8,3 +8,9 @@ def tasks(request):
     return render(request,"tasks/tasks.html",{
         "tasks":tasks
     })
+
+def task(request,id):
+    task = Task.objects.get(id=id)
+    return render(request,"tasks/task.html",{
+        "task" : task
+    })
