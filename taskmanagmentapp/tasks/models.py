@@ -5,14 +5,14 @@ from django.contrib.auth.models import User
 
 class Task(models.Model):
     PRIORITY_CHOICES = {
-        "high" : "High",
-        "medium" : "Medium",
-        "low" : "LOW", 
+        "High" : "high",
+        "Medium" : "medium",
+        "Low" : "low", 
     }
     STATUS_CHOICES = {
-        "completed" : "Completed",
-        "inprogress" : "In Progress",
-        "notstarted" : "Not Started"
+        "Completed" : "completed",
+        "In Progress" : "in_progress",
+        "Not Started" : "not_started"
     }
 
 
