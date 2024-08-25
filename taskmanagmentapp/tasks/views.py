@@ -1,13 +1,22 @@
 from django.shortcuts import render , redirect
 from .models import Task
 from .forms import TaskForm
+from django.db.models import Q
+from django.utils import timezone
+from datetime import timedelta
 
 # Create your views here.
 
 def tasks(request):
-    tasks = Task.objects.all()
+    search_query = ""
+    if request.GET.get("search"):
+        search_query = request.GET.get("search")
+    
+
+    tasks = Task.objects.filter(Q(title__icontains=search_query) | Q(priority__icontains=search_query) | Q(status__icontains=search_query))
     return render(request,"tasks/tasks.html",{
-        "tasks":tasks
+        "tasks":tasks,
+        "search_query" : search_query
     })
 
 def task(request,id):
@@ -50,3 +59,25 @@ def deleteTask(request,id):
     return render(request,"tasks/delete-task.html",{
         "task" : task
     })
+
+
+def dashboard(request):
+    total_tasks = Task.objects.all().count()
+    pending_tasks = Task.objects.filter(status="Not Started").count()
+    today = timezone.now().date()
+    threshold = today + timedelta(7)
+    upcoming_deadlines = Task.objects.filter(due_date__lte=threshold, due_date__gte=today)
+    tasks_due_soon = upcoming_deadlines.count()
+    return render(request,"tasks/dashboard.html",{
+        "total_tasks" : total_tasks,
+        "pending_tasks" : pending_tasks,
+        "tasks_due_soon" : tasks_due_soon,
+        "upcoming_deadlines" : upcoming_deadlines
+        
+    })
+
+today = timezone.now().date()
+print(today)
+
+threshold = today + timedelta(7)
+print(threshold)
