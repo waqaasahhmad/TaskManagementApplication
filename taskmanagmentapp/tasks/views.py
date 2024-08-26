@@ -1,6 +1,6 @@
 from django.shortcuts import render , redirect
 from .models import Task
-from .forms import TaskForm
+from .forms import TaskForm , ProfileForm
 from django.db.models import Q
 from django.utils import timezone
 from datetime import timedelta
@@ -11,12 +11,13 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 @login_required(login_url="login")
 def tasks(request):
+    profile = request.user.profile
     search_query = ""
     if request.GET.get("search"):
         search_query = request.GET.get("search")
     
 
-    tasks = Task.objects.filter(Q(title__icontains=search_query) | Q(priority__icontains=search_query) | Q(status__icontains=search_query))
+    tasks = profile.task_set.filter(Q(title__icontains=search_query) | Q(priority__icontains=search_query) | Q(status__icontains=search_query))
     return render(request,"tasks/tasks.html",{
         "tasks":tasks,
         "search_query" : search_query
@@ -114,8 +115,21 @@ def userlogin(request):
 
     return render(request,"tasks/login.html")
 
-
+@login_required(login_url="login")
 def userlogout(request):
     logout(request)
     return redirect("login")
 
+
+def userRegister(request):
+    if request.method == "POST":
+        form = ProfileForm(request.POST)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.save()
+            login(request,form)
+            return redirect("tasks")
+    form = ProfileForm()
+    return render(request,"tasks/user-registration.html",{
+        "form" : form
+    })
