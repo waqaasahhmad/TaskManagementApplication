@@ -16,7 +16,7 @@ class Task(models.Model):
     }
 
 
-    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    user = models.ForeignKey("Profile",on_delete=models.CASCADE,null=True,blank=True)
     title = models.CharField(max_length=200,null=True,blank=True)
     description = models.TextField(max_length=500,null=True,blank=True)
     assigned_to = models.CharField(max_length=200,blank=True,null=True)
@@ -24,10 +24,20 @@ class Task(models.Model):
     status = models.CharField(max_length=100,choices=STATUS_CHOICES,null=True,blank=True)
     due_date = models.DateField(null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
 
 
     def __str__(self):
         return self.title
 
 
+class Profile(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE, null=True,blank=True)
+    username = models.CharField(max_length=200)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=300)
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.username
